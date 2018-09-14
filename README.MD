@@ -5,62 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Modify the Schema
+### Create a Package.json
 
-```graphql
-type Query {
-    me: User
-    ...
-}
-```
+`npm init -y`
 
-### Modify Context
+`npm i nodemon -D`
 
-__index.js__
-```javascript
-const context = async ({req}) => {
-    const photos = db.collection('photos')
-    const users = db.collection('users')
-    const githubToken = req.headers.authorization
-    const currentUser = await users.findOne({ githubToken })
-    return { photos, users, currentUser }
-}
-```
-
-### Test
-
-```graphql
-query currentUser {
-  me {
-    name
-  }
-}
-
-mutation authorize {
-  githubAuth(code:"TEST") {
-    token 
-    user {
-      ...person
-    }
-  }
-}
-
-fragment person on User {
-  name
-  githubLogin
-  avatar
-  postedPhotos {
-    name
-  }
-}
-```
-
-__HTTP Headers__
 ```json
-{
-  "Authorization": "d4ef0d880dc3bfd4d445fb6a8c9674d6ebd86935"
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
+```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
+```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
