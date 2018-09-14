@@ -1,86 +1,44 @@
-const { ObjectID } = require('mongodb')
-const { authorizeWithGithub, generateFakeUsers } = require('./lib')
+const { generate } = require('short-id')
+
+const photos = require('../data/photos')
+const users = require('../data/users')
 
 module.exports = {
 
     Query: {
-        me: (parent, args, { currentUser }) => currentUser,
-        totalPhotos: (parent, args, { photos }) => photos.countDocuments(),
-        allPhotos: (parent, args, { photos }) => photos.find().toArray(),
-        Photo: (parent, { id }, { photos }) => photos.findOne({ _id: ObjectID(id) }),
-        totalUsers: (parent, args, { users }) => users.countDocuments(),
-        allUsers: (parent, args, { users }) => users.find().toArray(),
-        User: (parent, { githubLogin }, { users }) => users.findOne({ githubLogin })
+        totalPhotos: () => photos.length,
+        allPhotos: () => photos,
+        Photo: (parent, { id }) => photos.find(p => p.id === id),
+        totalUsers: () => users.length,
+        allUsers: () => users,
+        User: (parent, { id }) => users.find(p => p.id === id)
     },
 
     Mutation: {
-        postPhoto: async (parent, { input }, { photos, currentUser }) => {
+        postPhoto: (parent, { input }, { currentUser }) => {
 
             if (!currentUser) {
-                throw new Error('only an authorized user can post a photo')
+                throw new Error(`Only authorized users can post photos`)
             }
-        
-            const newPhoto = {
+
+            const id = generate()
+            const newPhoto = { 
+                id, 
                 ...input,
-                userID: currentUser.githubLogin
+                userID: currentUser.id 
             }
-        
-            const { insertedId } = await photos.insertOne(newPhoto)
-            newPhoto.id = insertedId.toString()
-        
+            photos.push(newPhoto)
             return newPhoto
-    
-        },
-        githubAuth: async (parent, { code }, { users }) => {
-
-            let payload
-
-            if (code === 'TEST') {
-                const { results:[fakeUser] } = await generateFakeUsers(1)
-                payload = {
-                    login: fakeUser.login.username,
-                    name: `${fakeUser.name.first} ${fakeUser.name.last}`,
-                    avatar_url: fakeUser.picture.thumbnail,
-                    access_token: fakeUser.login.sha1 
-                }
-            } else {
-                payload = await authorizeWithGithub({
-                    client_id: process.env.GITHUB_CLIENT_ID,
-                    client_secret: process.env.GITHUB_CLIENT_SECRET,
-                    code
-                })
-            }
-            
-            if (payload.message) {
-                throw new Error(payload.message)
-            }
-
-            const githubUserInfo = {
-                githubLogin: payload.login,
-                name: payload.name,
-                avatar: payload.avatar_url,
-                githubToken: payload.access_token
-            }
-
-            const { ops:[user] } = await users.replaceOne(
-                { githubLogin: payload.login }, 
-                githubUserInfo, 
-                { upsert: true }
-            )
-
-            return { user, token: user.githubToken }
-            
         }
     },
 
     Photo: {
-        id: parent => parent.id || parent._id.toString(),
         url: parent => `/img/photos/${parent.id}.jpg`,
-        postedBy: (parent, args, { users }) => users.findOne({ githubLogin: parent.userID })
+        postedBy: parent => users.find(u => u.id === parent.userID)
     },
 
     User: {
-        postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
+        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
     }
 
 }
