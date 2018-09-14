@@ -5,45 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Create a Github OAuth App
+### Create a Package.json
 
-__.env__
-```
-DB_HOST=mongodb://localhost:27017/photo-share
-GITHUB_CLIENT_ID=<YOUR_CLIENT_ID>
-GITHUB_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
-```
+`npm init -y`
 
-### Log the env variables
+`npm i nodemon -D`
 
-__resolvers.js__
-```javascript
-const { generate } = require('short-id')
-
-const photos = require('../data/photos')
-const users = require('../data/users')
-
-console.log('client id: ', process.env.GITHUB_CLIENT_ID)
-console.log('client secret: ', process.env.GITHUB_CLIENT_SECRET)
-
-...
-
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
+}
 ```
 
-### Modify the Index to Request a Github Code
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-app.get('/', (req, res) => {
-    let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
-    res.end(`
-        <h1>Welcome to the Photo Share API</h1>
-        <a href="${url}">Request a GitHub Code</a>
-    `)
-})
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Test by obtaining a github code
-Click the link on `http://localhost:4000`. You should be redirected to `http://localhost:3000?code=XYZ` with the code passed back from github via a query string.
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
