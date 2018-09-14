@@ -6,42 +6,45 @@ Changes
 ---------------
 Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Change index.js
+### Change Code
 
 ```graphql
-input PostPhotoInput {
-    name: String! 
-    description: String 
-    category: PhotoCategory=PORTRAIT
+type Photo {
+    id: ID!
+    name: String!
+    url: String!
+    description: String
+    category: PhotoCategory!
 }
 
-type Mutation {
-    postPhoto(input: PostPhotoInput!): Photo!
+type Query {
+    totalPhotos: Int!
+    allPhotos: [Photo!]!
 }
 ```
 
 ```javascript
 const resolvers = {
     
-    ....
-    
-    Mutation: {
-        postPhoto: (parent, { input }) => {
-            const id = generate()
-            const newPhoto = { id, ...input }
-            photos.push(newPhoto)
-            return newPhoto
-        }
+    ...
+
+    Photo: {
+        url: parent => `/img/photos/${parent.id}.jpg`
     }
 
 }
 ```
 
-### Test with Query Variables
+### Test Query
 
 ```graphql
-query countPhotos {
+query photos {
   totalPhotos
+  allPhotos {
+    id
+    name
+    url
+  }
 }
 
 mutation addPhoto($input: PostPhotoInput!) {
@@ -78,7 +81,7 @@ Iterations
 2. [x] Posting a Photo 
 3. [x] Handling Photo Categories 
 4. [x] Using an Input Type 
-5. [ ] Listing All Photos 
+5. [x] Listing All Photos 
 6. [ ] Querying a Single Photo 
 
 ### c. The User Type
