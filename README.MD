@@ -5,39 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change the index.js
+### Create a Package.json
 
-```graphql
-type User {
-    ...
-    postedPhotos: [Photo!]!
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
 const resolvers = {
-   
-    ...
-
-    User: {
-        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
+    Query: {
+        gnar: () => 'gnarly!!!'
     }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Test with a Query
+### Start the Server
 
-```graphql
-query photos {
-  allUsers {
-    id
-    name
-    postedPhotos {
-      name
-    }
-  }
-}
-```
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
