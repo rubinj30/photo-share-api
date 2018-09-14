@@ -5,124 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Add Subscriptions to the Schema
+### Create a Package.json
 
-```graphql
-type Subscription {
-    newUser: User!
-    newPhoto: Photo!
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-### Add Subscription support to the playground
+### Install Apollo Server
 
-__index.js__
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
 ```javascript
-app.get('/playground', expressPlayground({ 
-    endpoint: '/graphql',
-    subscriptionEndpoint: '/graphql' 
-}))
-```
+const { ApolloServer } = require('apollo-server')
 
-### Create httpServer to support websocket
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
 
-__index.js__
-```javascript
-const { createServer } = require('http')
-```
-
-* [ ] remove `app.listen({ port }, () => { ... })`
-
-__index.js__
-```javascript
-const httpServer = createServer(app)
-server.installSubscriptionHandlers(httpServer)
-httpServer.listen({ port }, () => {
-    console.log(`photo-share api running on port ${port}`)
-})
-```
-
-### Add PubSub 
-
-__index.js__
-```javascript
-const { ApolloServer, PubSub } = require('apollo-server-express')
-```
-
-__index.js__
-```javascript
-const client = await MongoClient.connect(process.env.DB_HOST, { useNewUrlParser: true })
-const db = client.db()
-const pubsub = new PubSub()
-
-const context = async ({ req, connection }) => {
-    ...
-    const githubToken = req ? req.headers.authorization : connection.context.Authorization
-    const currentUser = await users.findOne({ githubToken })
-    return { photos, users, currentUser, pubsub }
-}
-```
-
-### Add Subscription Resolvers
-
-__resolvers.js__
-```javascript
-Subscription: {
-    newPhoto: {
-        subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('photo-added')
-    },
-    newUser: {
-        subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('user-added')
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
     }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Publish Events
+### Start the Server
 
-__resolvers.js__
-```javascript
- Mutation: {
-    postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
+`npm start`
 
-        ...
-    
-        pubsub.publish('photo-added', { newPhoto })
+Browse [http://localhost:4000](http://localhost:4000)
 
-        return newPhoto
-
-    },
-    githubAuth: async (parent, { code }, { users, pubsub }) => {
-
-        ...
-
-        pubsub.publish('user-added', { newUser: user })
-
-        return { user, token: user.githubToken }
-        
-    }
-},
-```
-
-### Test
-
-```graphql
-subscription {
-  newUser {
-    name
-  }
-}
-```
-
-```graphql
-mutation auth {
-  githubAuth(code: "TEST") {
-    token
-    user {
-      name
-    }
-  }
-}
-```
 
 Iterations
 ---------------
