@@ -2,17 +2,57 @@ PhotoShare API
 ===============
 PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.graphqlworkshop.com). In this exercise, students build a GraphQL API for a small photo sharing application.
 
-Challenge
+Changes
 ---------------
 Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Goals
+### Create a Package.json
 
-* [ ] Resolve the current queries using the sample data
-* [ ] Ability to Query the __totalUsers__ count
-* [ ] Ability to Query __allUsers__ records
-* [ ] Ability to Query an individual __User__
-* [ ] Customize the sample data, add your own records to use
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
+}
+```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
+```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
+```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
