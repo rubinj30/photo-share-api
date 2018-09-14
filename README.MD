@@ -5,64 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Add a file type to the Post Photo Input
+### Create a Package.json
 
-```graphql
-input PostPhotoInput {
-    name: String! 
-    description: String 
-    category: PhotoCategory=PORTRAIT
-    file: Upload!
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-### Modify the Resolver to Accept the file
+### Install Apollo Server
 
-__resolvers.js__
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
 ```javascript
-const path = require('path')
-const { authorizeWithGithub, generateFakeUsers, uploadFile } = require('./lib')
-```
+const { ApolloServer } = require('apollo-server')
 
-__resolvers.js__
-```javascript
-postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
-
-    if (!input.file) {
-        throw new Error('a photo file is required')
+const typeDefs = `
+    type Query {
+        gnar: String
     }
+`
 
-    ...
-    
-    var toPath = path.join(__dirname, '..', 'assets', 'photos', `${newPhoto.id}.jpg`)
-    await uploadFile(input.file, toPath)
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
 
-    pubsub.publish('photo-added', { newPhoto })
+const server = new ApolloServer({ typeDefs, resolvers })
 
-    return newPhoto
-
-},
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Serve the assets folder
+### Start the Server
 
-__index.js__
-```javascript
-const path = require('path')
+`npm start`
 
-...
+Browse [http://localhost:4000](http://localhost:4000)
 
-app.use(
-    '/img/photos',
-    express.static(path.join(__dirname, '..', 'assets', 'photos'))
-)
-```
-
-### Test the Upload (no playground)
-
-* [ ] navigate to [http://localhost:4000/img/photos](http://localhost:4000/img/photos)
-* [ ] add a users `githubToken` to the first token field
-* [ ] Click browser and select an image
 
 Iterations
 ---------------
