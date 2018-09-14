@@ -5,59 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Import Object ID
+### Create a Package.json
 
-* [ ] Remove `const photos = require('../data/photos')`
+`npm init -y`
 
-```javascript
-const { ObjectID } = require('mongodb')
-```
+`npm i nodemon -D`
 
-### Modify postPhoto Mutation
-
-```javascript
-postPhoto: async (parent, { input }, { photos, currentUser }) => {
-
-    if (!currentUser) {
-        throw new Error('only an authorized user can post a photo')
-    }
-
-    const newPhoto = {
-        ...input,
-        userID: currentUser.githubLogin
-    }
-
-    const { insertedId } = await photos.insertOne(newPhoto)
-    newPhoto.id = insertedId.toString()
-
-    return newPhoto
-
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-### Modify Query Resolvers
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-Query: {        
-    totalPhotos: (parent, args, { photos }) => photos.countDocuments(),
-    allPhotos: (parent, args, { photos }) => photos.find().toArray(),
-    Photo: (parent, { id }, { photos }) => photos.findOne({ _id: ObjectID(id) }),
-    ...
-},
-```
+const { ApolloServer } = require('apollo-server')
 
-### Modify Type Resolvers
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
 
-```javascript
-Photo: {
-    ...
-    postedBy: (parent, args, { users }) => users.findOne({ githubLogin: parent.userID })
-},
-
-User: {
-    postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
