@@ -2,15 +2,13 @@ const { ApolloServer } = require('apollo-server')
 
 const typeDefs = `
     type Query {
-        totalPhotos: Int!
+        gnar: String
     }
 `
 
-const photos = []
-
 const resolvers = {
     Query: {
-        totalPhotos: () => photos.length
+        gnar: () => 'gnarly!!!'
     }
 }
 
