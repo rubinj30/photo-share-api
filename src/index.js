@@ -21,12 +21,14 @@ const typeDefs = `
         totalPhotos: Int!
     }
 
+    input PostPhotoInput {
+        name: String! 
+        description: String 
+        category: PhotoCategory=PORTRAIT
+    }
+
     type Mutation {
-        postPhoto(
-            name: String! 
-            description: String 
-            category: PhotoCategory=PORTRAIT
-        ): Photo!
+        postPhoto(input: PostPhotoInput!): Photo!
     }
 
 `
@@ -38,9 +40,9 @@ const resolvers = {
         totalPhotos: () => photos.length
     },
     Mutation: {
-        postPhoto: (parent, args) => {
+        postPhoto: (parent, { input }) => {
             const id = generate()
-            const newPhoto = { id, ...args }
+            const newPhoto = { id, ...input }
             photos.push(newPhoto)
             return newPhoto
         }
