@@ -5,57 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change the index.js file
+### Create a Package.json
 
-```graphql
-type Query {
-    totalPhotos: Int!
-    allPhotos: [Photo!]!
-    Photo(id:ID!): Photo
-}
-```
+`npm init -y`
 
-```javascript
-const resolvers = {
-    Query: {
-
-        ...
-        
-        Photo: (parent, { id }) => photos.find(p => p.id === id)
-    },
-
-    ...
-
-```
-
-### Add a new query 
-
-```graphql
-query getPhoto {
-  Photo(id:"5242445") {
-    name
-    url
-  }
-}
-```
-
-
-### Use Query Parameters
-
-```graphql
-query getPhoto($photo_id:ID!) {
-  Photo(id:$photo_id) {
-    name
-    url
-  }
-}
-```
+`npm i nodemon -D`
 
 ```json
-{
-  "photo_id":"524244"
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
+```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
+```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
