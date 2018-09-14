@@ -5,57 +5,69 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change the index.js
+### Move typeDefs to typeDefs.graphql
 
+__index.js__
 ```javascript
-const context = {
-    currentUser: users.find(u => u.name === "Glen Plake")
-}
-
-const server = new ApolloServer({ typeDefs, resolvers, context })
+const { readFileSync } = require('fs')
+const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
 ```
 
-### Test with a Query
+### Move resolvers to resolvers.js
 
-```graphql
-query photos($id: ID!) {
-  User(id: $id) {
-    name
-    postedPhotos {
-      name
-      url
-    }
-  }
-}
+__resolvers.js__
+```javascript
+const { generate } = require('short-id')
 
-mutation post($input:PostPhotoInput!) {
-  postPhoto(input:$input) {
-    id
-    url
-    postedBy {
-      name
-    }
-  }
+const photos = require('../data/photos')
+const users = require('../data/users')
+
+module.exports = {
+    Query: { ... },
+    Mutation: { ... },
+    Photo: { ... },
+    User: { ... }
 }
 ```
 
+__index.js__
+* [ ] Remove photos, users, and short-id/generate
+```javascript
+const resolvers = require('./resolvers')
+```
+
+### Add Environment variables
+
+* [ ] Add `.env` file: `DB_HOST=mongodb://localhost:27017/photo-share`
+* [ ] Add `.env` to `.gitignore`
+* [ ] Install `dotenv`: `npm i dotenv`
+* [ ] Modify `start` script in `package.json`.
+* [ ] Log the `process.env.DB_HOST` to make sure environment vars are working
+* [ ] Start the app: `npm start`
+
+__package.json__
 ```json
-{
-  "id":"b",
-  "input": {
-    "name": "Sick Turns",
-  	"description": "Carving big turns in the deep powder.",
-  	"category": "ACTION"
-  }
+"scripts": {
+  "start": "nodemon -r dotenv/config ./src/index.js"
 }
 ```
 
-### Test the Error: Change the currentUser in index.js
-
+__index.js__
 ```javascript
+const { ApolloServer } = require('apollo-server')
+const { readFileSync } = require('fs')
+
+const resolvers = require('./resolvers')
+const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
+
+console.log('database host: ', process.env.DB_HOST)
+
 const context = {
     currentUser: null
 }
+
+...
+
 ```
 
 Iterations
@@ -82,16 +94,11 @@ Iterations
 3. [x] Connecting Users to Photos
 4. [x] Adding currentUser to context
 
-### d. Context
+### d. Database and Context
 
 1. [x] Add environment and refactor
-2. [x] Configuring a Database
-3. [x] Configure an express server
-4. [x] Configure Github OAuth
-5. [x] Add `githubLogin` mutation
-6. [ ] Add fake users to `githubLogin` mutation
-7. [ ] Identify the `currentUser`
-8. [ ] Post new Photos to the Database
+2. [ ] Restructuring Queries
+3. [ ] Restructuring Mutations
 
 ### e. Subscriptions and Custom Scalars
 
