@@ -6,53 +6,23 @@ Changes
 ---------------
 Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Create a Package.json
-
-`npm init -y`
-
-`npm i nodemon -D`
-
-```json
-"scripts": {
-    "start": "nodemon ./src/index.js"
-}
-```
-
-### Install Apollo Server
-
-`npm i apollo-server graphql`
-
-### Add an index.js file
+### Count photos in index.js
 
 ```javascript
-const { ApolloServer } = require('apollo-server')
-
 const typeDefs = `
     type Query {
-        gnar: String
+        totalPhotos: Int!
     }
 `
 
+const photos = []
+
 const resolvers = {
     Query: {
-        gnar: () => 'gnarly!!!'
+        totalPhotos: () => photos.length
     }
 }
-
-const server = new ApolloServer({ typeDefs, resolvers })
-
-server.listen()
-    .then(({port}) => `server listening on ${port}`)
-    .then(console.log)
-    .catch(console.error)
 ```
-
-### Start the Server
-
-`npm start`
-
-Browse [http://localhost:4000](http://localhost:4000)
-
 
 Iterations
 ---------------
@@ -65,11 +35,11 @@ Iterations
 ### b. The Photo Type
 
 1. [x] Counting the Photos 
-2. [x] Posting a Photo 
-3. [x] Handling Photo Categories 
-4. [x] Using an Input Type 
-5. [x] Listing All Photos 
-6. [x] Querying a Single Photo 
+2. [ ] Posting a Photo 
+3. [ ] Handling Photo Categories 
+4. [ ] Using an Input Type 
+5. [ ] Listing All Photos 
+6. [ ] Querying a Single Photo 
 
 ### c. The User Type
 
