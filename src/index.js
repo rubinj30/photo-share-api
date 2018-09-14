@@ -1,16 +1,18 @@
 const { ApolloServer } = require('apollo-server')
-const { readFileSync } = require('fs')
 
-const resolvers = require('./resolvers')
-const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
 
-console.log('database host: ', process.env.DB_HOST)
-
-const context = {
-    currentUser: null
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
 }
 
-const server = new ApolloServer({ typeDefs, resolvers, context })
+const server = new ApolloServer({ typeDefs, resolvers })
 
 server.listen()
     .then(({port}) => `server listening on ${port}`)

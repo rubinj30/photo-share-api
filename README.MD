@@ -5,70 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Move typeDefs to typeDefs.graphql
+### Create a Package.json
 
-__index.js__
-```javascript
-const { readFileSync } = require('fs')
-const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
-```
+`npm init -y`
 
-### Move resolvers to resolvers.js
+`npm i nodemon -D`
 
-__resolvers.js__
-```javascript
-const { generate } = require('short-id')
-
-const photos = require('../data/photos')
-const users = require('../data/users')
-
-module.exports = {
-    Query: { ... },
-    Mutation: { ... },
-    Photo: { ... },
-    User: { ... }
-}
-```
-
-__index.js__
-* [ ] Remove photos, users, and short-id/generate
-```javascript
-const resolvers = require('./resolvers')
-```
-
-### Add Environment variables
-
-* [ ] Add `.env` file: `DB_HOST=mongodb://localhost:27017/photo-share`
-* [ ] Add `.env` to `.gitignore`
-* [ ] Install `dotenv`: `npm i dotenv`
-* [ ] Modify `start` script in `package.json`.
-* [ ] Log the `process.env.DB_HOST` to make sure environment vars are working
-* [ ] Start the app: `npm start`
-
-__package.json__
 ```json
 "scripts": {
-  "start": "nodemon -r dotenv/config ./src/index.js"
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-__index.js__
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
 ```javascript
 const { ApolloServer } = require('apollo-server')
-const { readFileSync } = require('fs')
 
-const resolvers = require('./resolvers')
-const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
 
-console.log('database host: ', process.env.DB_HOST)
-
-const context = {
-    currentUser: null
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
 }
 
-...
+const server = new ApolloServer({ typeDefs, resolvers })
 
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
