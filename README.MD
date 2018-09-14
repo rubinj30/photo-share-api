@@ -5,65 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Install short-id
+### Create a Package.json
 
-`npm i short-id`
+`npm init -y`
 
-### Change index.js
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
+}
+```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-const { generate } = require('short-id')
+const { ApolloServer } = require('apollo-server')
 
 const typeDefs = `
-
-    type Photo {
-        id: ID!
-        name: String!
-        description: String
-    }
-
     type Query {
-        totalPhotos: Int!
+        gnar: String
     }
-
-    type Mutation {
-        postPhoto(name: String! description: String): Photo!
-    }
-
 `
-
-const photos = []
 
 const resolvers = {
     Query: {
-        totalPhotos: () => photos.length
-    },
-    Mutation: {
-        postPhoto: (parent, args) => {
-            const id = generate()
-            const newPhoto = { id, ...args }
-            photos.push(newPhoto)
-            return newPhoto
-        }
+        gnar: () => 'gnarly!!!'
     }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Test Queries
+### Start the Server
 
-```graphql
-query countPhotos {
-  totalPhotos
-}
+`npm start`
 
-mutation addPhoto {
-  postPhoto(name:"Tahoe Sunset") {
-    id
-    name
-    description
-  }
-}
-```
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
