@@ -3,9 +3,6 @@ const { generate } = require('short-id')
 const photos = require('../data/photos')
 const users = require('../data/users')
 
-console.log('client id: ', process.env.GITHUB_CLIENT_ID)
-console.log('client secret: ', process.env.GITHUB_CLIENT_SECRET)
-
 module.exports = {
 
     Query: {
