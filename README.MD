@@ -5,110 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Modify Schema for Github User Auth
+### Create a Package.json
 
-__Modify the user type__
-```graphql
-type User {
-    githubLogin: ID!
-    name: String!
-    avatar: String!
-    postedPhotos: [Photo!]!
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-__Modify the User Query__
-```graphql
-type Query {
-    ...
-    User(githubLogin:ID!): User
-}
-```
+### Install Apollo Server
 
-__Add the Mutation__
-```graphql
-type AuthPayload {
-    token: String!
-    user: User!
-}
+`npm i apollo-server graphql`
 
-type Mutation {
-    postPhoto(input: PostPhotoInput!): Photo!
-    githubAuth(code: String!): AuthPayload!
-}
-```
+### Add an index.js file
 
-### Modify the Query Resolvers
-
-* [ ] Remove: `const photos = require('../data/photos')`
-* [ ] Resolver Query users with __users__ collection
-
-__resolvers.js__
 ```javascript
-const { generate } = require('short-id')
+const { ApolloServer } = require('apollo-server')
 
-const photos = require('../data/photos')
-
-module.exports = {
-
-    Query: {
-        ...
-
-        totalUsers: (parent, args, { users }) => users.countDocuments(),
-        allUsers: (parent, args, { users }) => users.find().toArray(),
-        User: (parent, { githubLogin }, { users }) => users.findOne({ githubLogin })
-    
-    },
-```
-
-### Add the githubLogin Mutation
-
-__resolvers.js__
-```javascript
-const { authorizeWithGithub } = require('./lib')
-
-...
-
-module.exports = {
-
-    ...
-
-    Mutation: {
-        githubAuth: async (parent, { code }, { users }) => {
-
-            const payload = await authorizeWithGithub({
-                client_id: process.env.GITHUB_CLIENT_ID,
-                client_secret: process.env.GITHUB_CLIENT_SECRET,
-                code
-            })
-
-            if (payload.message) {
-                throw new Error(payload.message)
-            }
-
-            const githubUserInfo = {
-                githubLogin: payload.login,
-                name: payload.name,
-                avatar: payload.avatar_url,
-                githubToken: payload.access_token
-            }
-
-            const { ops:[user] } = await users.replaceOne(
-                { githubLogin: payload.login }, 
-                githubUserInfo, 
-                { upsert: true }
-            )
-
-            return { user, token: user.githubToken }
-            
-        }
+const typeDefs = `
+    type Query {
+        gnar: String
     }
+`
 
-    ...
-    
-}    
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
 
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
