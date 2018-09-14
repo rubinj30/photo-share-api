@@ -19,6 +19,7 @@ const typeDefs = `
         url: String!
         description: String
         category: PhotoCategory!
+        postedBy: User!
     }
 
     type User {
@@ -65,7 +66,8 @@ const resolvers = {
         }
     },
     Photo: {
-        url: parent => `/img/photos/${parent.id}.jpg`
+        url: parent => `/img/photos/${parent.id}.jpg`,
+        postedBy: parent => users.find(u => u.id === parent.userID)
     }
 }
 
