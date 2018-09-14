@@ -5,66 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Modify the githubAuth Resolver
+### Create a Package.json
+
+`npm init -y`
+
+`npm i nodemon -D`
+
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
+}
+```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-const { authorizeWithGithub, generateFakeUsers } = require('./lib')
-```
+const { ApolloServer } = require('apollo-server')
 
-```javascript
-githubAuth: async (parent, { code }, { users }) => {
-
-    let payload
-
-    if (code === 'TEST') {
-        const { results:[fakeUser] } = await generateFakeUsers(1)
-        payload = {
-            login: fakeUser.login.username,
-            name: `${fakeUser.name.first} ${fakeUser.name.last}`,
-            avatar_url: fakeUser.picture.thumbnail,
-            access_token: fakeUser.login.sha1 
-        }
-    } else {
-        payload = await authorizeWithGithub({
-            client_id: process.env.GITHUB_CLIENT_ID,
-            client_secret: process.env.GITHUB_CLIENT_SECRET,
-            code
-        })
+const typeDefs = `
+    type Query {
+        gnar: String
     }
-    
-   ...
-    
-}
-```
+`
 
-### Add Some Test Users
-
-```graphql
-query users {
-  totalUsers
-  allUsers {
-    ...person
-  }
-}
-
-mutation addTestUser {
-  githubAuth(code:"TEST") {
-    token 
-    user {
-      ...person
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
     }
-  }
 }
 
-fragment person on User {
-  name
-  githubLogin
-  avatar
-  postedPhotos {
-    name
-  }
-}
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
