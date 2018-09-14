@@ -13,12 +13,14 @@ const typeDefs = `
     type Photo {
         id: ID!
         name: String!
+        url: String!
         description: String
         category: PhotoCategory!
     }
 
     type Query {
         totalPhotos: Int!
+        allPhotos: [Photo!]!
     }
 
     input PostPhotoInput {
@@ -37,7 +39,8 @@ const photos = []
 
 const resolvers = {
     Query: {
-        totalPhotos: () => photos.length
+        totalPhotos: () => photos.length,
+        allPhotos: () => photos
     },
     Mutation: {
         postPhoto: (parent, { input }) => {
@@ -46,6 +49,9 @@ const resolvers = {
             photos.push(newPhoto)
             return newPhoto
         }
+    },
+    Photo: {
+        url: parent => `/img/photos/${parent.id}.jpg`
     }
 }
 
