@@ -59,9 +59,18 @@ const resolvers = {
         User: (parent, { id }) => users.find(p => p.id === id)
     },
     Mutation: {
-        postPhoto: (parent, { input }) => {
+        postPhoto: (parent, { input }, { currentUser }) => {
+
+            if (!currentUser) {
+                throw new Error(`Only authorized users can post photos`)
+            }
+
             const id = generate()
-            const newPhoto = { id, ...input }
+            const newPhoto = { 
+                id, 
+                ...input,
+                userID: currentUser.id 
+            }
             photos.push(newPhoto)
             return newPhoto
         }
@@ -75,7 +84,11 @@ const resolvers = {
     }
 }
 
-const server = new ApolloServer({ typeDefs, resolvers })
+const context = {
+    currentUser: users.find(u => u.name === "Glen Plake")
+}
+
+const server = new ApolloServer({ typeDefs, resolvers, context })
 
 server.listen()
     .then(({port}) => `server listening on ${port}`)
