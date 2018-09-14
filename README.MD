@@ -6,21 +6,23 @@ Changes
 ---------------
 Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Install short-id
-
-`npm i short-id`
-
-### Change index.js
+### Change index.js Code
 
 ```javascript
-const { generate } = require('short-id')
-
 const typeDefs = `
+
+    enum PhotoCategory {
+        PORTRAIT
+        LANDSCAPE
+        ACTION
+        GRAPHIC
+    }
 
     type Photo {
         id: ID!
         name: String!
         description: String
+        category: PhotoCategory!
     }
 
     type Query {
@@ -28,41 +30,46 @@ const typeDefs = `
     }
 
     type Mutation {
-        postPhoto(name: String! description: String): Photo!
+        postPhoto(
+            name: String! 
+            description: String 
+            category: PhotoCategory=PORTRAIT
+        ): Photo!
     }
 
 `
-
-const photos = []
-
-const resolvers = {
-    Query: {
-        totalPhotos: () => photos.length
-    },
-    Mutation: {
-        postPhoto: (parent, args) => {
-            const id = generate()
-            const newPhoto = { id, ...args }
-            photos.push(newPhoto)
-            return newPhoto
-        }
-    }
-}
 ```
 
-### Test Queries
+### Test with Query Variables
 
 ```graphql
 query countPhotos {
   totalPhotos
 }
 
-mutation addPhoto {
-  postPhoto(name:"Tahoe Sunset") {
+mutation addPhoto(
+  $name: String! 
+  $description: String
+  $category:PhotoCategory
+) {
+  postPhoto(
+    name:$name 
+    description:$description
+    category:$category
+  ) {
     id
     name
     description
+    category
   }
+}
+```
+
+```json
+{
+  "name": "Stick the Landing",
+  "description": "Glen going big at Mammoth",
+  "category": "ACTION"
 }
 ```
 
@@ -78,7 +85,7 @@ Iterations
 
 1. [x] Counting the Photos 
 2. [x] Posting a Photo 
-3. [ ] Handling Photo Categories 
+3. [x] Handling Photo Categories 
 4. [ ] Using an Input Type 
 5. [ ] Listing All Photos 
 6. [ ] Querying a Single Photo 
