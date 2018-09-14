@@ -5,61 +5,52 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Add a userID to sample Photo Data
+### Create a Package.json
+
+`npm init -y`
+
+`npm i nodemon -D`
 
 ```json
-[
-    { 
-      "id": "1", 
-      "name": "Kirkwood Blue Bird",
-      "description": "Dropping the heart chute",
-      "category": "ACTION",
-      "userID": "a"
-    },
-    { 
-      "id": "2", 
-      "name": "Squaw Valley",
-      "description": "chimney chute",
-      "category": "LANDSCAPE",
-      "userID": "b"
-    }
-]
-```
-
-### Change the index.js
-
-```graphql
-type Photo {
-    ...
-    postedBy: User!
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
 const resolvers = {
-    
-    ...
-
-    Photo: {
-        url: parent => `/img/photos/${parent.id}.jpg`,
-        postedBy: parent => users.find(u => u.id === parent.userID)
+    Query: {
+        gnar: () => 'gnarly!!!'
     }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
 
-### Test with a Query
+### Start the Server
 
-```graphql
-query photos {
-  allPhotos {
-    id
-    name
-    postedBy {
-      name
-    }
-  }
-}
-```
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
 
 
 Iterations
