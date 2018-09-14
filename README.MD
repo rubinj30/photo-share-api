@@ -5,44 +5,22 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Add a userID to sample Photo Data
-
-```json
-[
-    { 
-      "id": "1", 
-      "name": "Kirkwood Blue Bird",
-      "description": "Dropping the heart chute",
-      "category": "ACTION",
-      "userID": "a"
-    },
-    { 
-      "id": "2", 
-      "name": "Squaw Valley",
-      "description": "chimney chute",
-      "category": "LANDSCAPE",
-      "userID": "b"
-    }
-]
-```
-
 ### Change the index.js
 
 ```graphql
-type Photo {
+type User {
     ...
-    postedBy: User!
+    postedPhotos: [Photo!]!
 }
 ```
 
 ```javascript
 const resolvers = {
-    
+   
     ...
 
-    Photo: {
-        url: parent => `/img/photos/${parent.id}.jpg`,
-        postedBy: parent => users.find(u => u.id === parent.userID)
+    User: {
+        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
     }
 }
 ```
@@ -51,16 +29,15 @@ const resolvers = {
 
 ```graphql
 query photos {
-  allPhotos {
+  allUsers {
     id
     name
-    postedBy {
+    postedPhotos {
       name
     }
   }
 }
 ```
-
 
 Iterations
 ---------------
@@ -83,8 +60,8 @@ Iterations
 
 1. [x] Challenge: Adding the User Type
 2. [x] Connecting Photos to Users
-3. [ ] Connecting Users to Photos
-4. [ ] Requiring a User to Post a Photo
+3. [x] Connecting Users to Photos
+4. [ ] Adding currentUser to context
 
 ### e. Database and Context
 
