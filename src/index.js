@@ -14,7 +14,7 @@ const typeDefs = `
     }
 
     type Mutation {
-        postPhoto(name: String!, description: String): Photo!
+        postPhoto(name: String! description: String): Photo!
     }
 
 `
