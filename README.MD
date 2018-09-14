@@ -2,17 +2,65 @@ PhotoShare API
 ===============
 PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.graphqlworkshop.com). In this exercise, students build a GraphQL API for a small photo sharing application.
 
-Challenge
+Changes
 ---------------
-Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Goals
+### Add a userID to sample Photo Data
 
-* [ ] Resolve the current queries using the sample data
-* [ ] Ability to Query the __totalUsers__ count
-* [ ] Ability to Query __allUsers__ records
-* [ ] Ability to Query an individual __User__
-* [ ] Customize the sample data, add your own records to use
+```json
+[
+    { 
+      "id": "1", 
+      "name": "Kirkwood Blue Bird",
+      "description": "Dropping the heart chute",
+      "category": "ACTION",
+      "userID": "a"
+    },
+    { 
+      "id": "2", 
+      "name": "Squaw Valley",
+      "description": "chimney chute",
+      "category": "LANDSCAPE",
+      "userID": "b"
+    }
+]
+```
+
+### Change the index.js
+
+```graphql
+type Photo {
+    ...
+    postedBy: User!
+}
+```
+
+```javascript
+const resolvers = {
+    
+    ...
+
+    Photo: {
+        url: parent => `/img/photos/${parent.id}.jpg`,
+        postedBy: parent => users.find(u => u.id === parent.userID)
+    }
+}
+```
+
+### Test with a Query
+
+```graphql
+query photos {
+  allPhotos {
+    id
+    name
+    postedBy {
+      name
+    }
+  }
+}
+```
+
 
 Iterations
 ---------------
@@ -34,8 +82,9 @@ Iterations
 ### c. The User Type
 
 1. [x] Challenge: Adding the User Type
-2. [ ] Connecting Users to Photos
-3. [ ] Connecting Photos to Users
+2. [x] Connecting Photos to Users
+3. [ ] Connecting Users to Photos
+4. [ ] Requiring a User to Post a Photo
 
 ### d. Context
 
