@@ -7,35 +7,54 @@ Changes
 
 ### Change the index.js
 
-```graphql
-type User {
-    ...
-    postedPhotos: [Photo!]!
-}
-```
-
 ```javascript
-const resolvers = {
-   
-    ...
-
-    User: {
-        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
-    }
+const context = {
+    currentUser: users.find(u => u.name === "Glen Plake")
 }
+
+const server = new ApolloServer({ typeDefs, resolvers, context })
 ```
 
 ### Test with a Query
 
 ```graphql
-query photos {
-  allUsers {
-    id
+query photos($id: ID!) {
+  User(id: $id) {
     name
     postedPhotos {
       name
+      url
     }
   }
+}
+
+mutation post($input:PostPhotoInput!) {
+  postPhoto(input:$input) {
+    id
+    url
+    postedBy {
+      name
+    }
+  }
+}
+```
+
+```json
+{
+  "id":"b",
+  "input": {
+    "name": "Sick Turns",
+  	"description": "Carving big turns in the deep powder.",
+  	"category": "ACTION"
+  }
+}
+```
+
+### Test the Error: Change the currentUser in index.js
+
+```javascript
+const context = {
+    currentUser: users.find(u => u.name === "Eve Porcello")
 }
 ```
 
@@ -61,7 +80,7 @@ Iterations
 1. [x] Challenge: Adding the User Type
 2. [x] Connecting Photos to Users
 3. [x] Connecting Users to Photos
-4. [ ] Adding currentUser to context
+4. [x] Adding currentUser to context
 
 ### d. Context
 
