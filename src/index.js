@@ -21,6 +21,7 @@ const typeDefs = `
     type Query {
         totalPhotos: Int!
         allPhotos: [Photo!]!
+        Photo(id:ID!): Photo
     }
 
     input PostPhotoInput {
@@ -40,7 +41,8 @@ const photos = []
 const resolvers = {
     Query: {
         totalPhotos: () => photos.length,
-        allPhotos: () => photos
+        allPhotos: () => photos,
+        Photo: (parent, { id }) => photos.find(p => p.id === id)
     },
     Mutation: {
         postPhoto: (parent, { input }) => {
