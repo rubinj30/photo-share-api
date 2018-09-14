@@ -54,7 +54,7 @@ mutation post($input:PostPhotoInput!) {
 
 ```javascript
 const context = {
-    currentUser: users.find(u => u.name === "Eve Porcello")
+    currentUser: null
 }
 ```
 
