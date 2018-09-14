@@ -5,38 +5,35 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change index.js Code
+### Change index.js
+
+```graphql
+input PostPhotoInput {
+    name: String! 
+    description: String 
+    category: PhotoCategory=PORTRAIT
+}
+
+type Mutation {
+    postPhoto(input: PostPhotoInput!): Photo!
+}
+```
 
 ```javascript
-const typeDefs = `
-
-    enum PhotoCategory {
-        PORTRAIT
-        LANDSCAPE
-        ACTION
-        GRAPHIC
+const resolvers = {
+    
+    ....
+    
+    Mutation: {
+        postPhoto: (parent, { input }) => {
+            const id = generate()
+            const newPhoto = { id, ...input }
+            photos.push(newPhoto)
+            return newPhoto
+        }
     }
 
-    type Photo {
-        id: ID!
-        name: String!
-        description: String
-        category: PhotoCategory!
-    }
-
-    type Query {
-        totalPhotos: Int!
-    }
-
-    type Mutation {
-        postPhoto(
-            name: String! 
-            description: String 
-            category: PhotoCategory=PORTRAIT
-        ): Photo!
-    }
-
-`
+}
 ```
 
 ### Test with Query Variables
@@ -46,16 +43,8 @@ query countPhotos {
   totalPhotos
 }
 
-mutation addPhoto(
-  $name: String! 
-  $description: String
-  $category:PhotoCategory
-) {
-  postPhoto(
-    name:$name 
-    description:$description
-    category:$category
-  ) {
+mutation addPhoto($input: PostPhotoInput!) {
+  postPhoto(input:$input) {
     id
     name
     description
@@ -66,9 +55,11 @@ mutation addPhoto(
 
 ```json
 {
-  "name": "Stick the Landing",
-  "description": "Glen going big at Mammoth",
-  "category": "ACTION"
+  "input": {
+    "name": "Stick the Landing",
+    "description": "Glen going big at Mammoth",
+    "category": "ACTION"
+  }
 }
 ```
 
@@ -85,7 +76,7 @@ Iterations
 1. [x] Counting the Photos 
 2. [x] Posting a Photo 
 3. [x] Handling Photo Categories 
-4. [ ] Using an Input Type 
+4. [x] Using an Input Type 
 5. [ ] Listing All Photos 
 6. [ ] Querying a Single Photo 
 
