@@ -1,6 +1,9 @@
 const { ApolloServer } = require('apollo-server')
 const { generate } = require('short-id')
 
+const photos = require('../data/photos')
+const users = require('../data/users')
+
 const typeDefs = `
 
     enum PhotoCategory {
@@ -18,10 +21,18 @@ const typeDefs = `
         category: PhotoCategory!
     }
 
+    type User {
+        id: ID!
+        name: String!
+    }
+
     type Query {
         totalPhotos: Int!
         allPhotos: [Photo!]!
         Photo(id:ID!): Photo
+        totalUsers: Int!
+        allUsers: [User!]!
+        User(id:ID!): User
     }
 
     input PostPhotoInput {
@@ -36,13 +47,14 @@ const typeDefs = `
 
 `
 
-const photos = []
-
 const resolvers = {
     Query: {
         totalPhotos: () => photos.length,
         allPhotos: () => photos,
-        Photo: (parent, { id }) => photos.find(p => p.id === id)
+        Photo: (parent, { id }) => photos.find(p => p.id === id),
+        totalUsers: () => users.length,
+        allUsers: () => users,
+        User: (parent, { id }) => users.find(p => p.id === id)
     },
     Mutation: {
         postPhoto: (parent, { input }) => {
