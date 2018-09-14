@@ -25,6 +25,7 @@ const typeDefs = `
     type User {
         id: ID!
         name: String!
+        postedPhotos: [Photo!]!
     }
 
     type Query {
@@ -68,6 +69,9 @@ const resolvers = {
     Photo: {
         url: parent => `/img/photos/${parent.id}.jpg`,
         postedBy: parent => users.find(u => u.id === parent.userID)
+    },
+    User: {
+        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
     }
 }
 
