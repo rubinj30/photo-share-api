@@ -5,66 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change Code
+### Create a Package.json
 
-```graphql
-type Photo {
-    id: ID!
-    name: String!
-    url: String!
-    description: String
-    category: PhotoCategory!
-}
+`npm init -y`
 
-type Query {
-    totalPhotos: Int!
-    allPhotos: [Photo!]!
-}
-```
-
-```javascript
-const resolvers = {
-    
-    ...
-
-    Photo: {
-        url: parent => `/img/photos/${parent.id}.jpg`
-    }
-
-}
-```
-
-### Test Query
-
-```graphql
-query photos {
-  totalPhotos
-  allPhotos {
-    id
-    name
-    url
-  }
-}
-
-mutation addPhoto($input: PostPhotoInput!) {
-  postPhoto(input:$input) {
-    id
-    name
-    description
-    category
-  }
-}
-```
+`npm i nodemon -D`
 
 ```json
-{
-  "input": {
-    "name": "Stick the Landing",
-    "description": "Glen going big at Mammoth",
-    "category": "ACTION"
-  }
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
+```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
+```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
