@@ -5,72 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change index.js Code
+### Create a Package.json
 
-```javascript
-const typeDefs = `
+`npm init -y`
 
-    enum PhotoCategory {
-        PORTRAIT
-        LANDSCAPE
-        ACTION
-        GRAPHIC
-    }
-
-    type Photo {
-        id: ID!
-        name: String!
-        description: String
-        category: PhotoCategory!
-    }
-
-    type Query {
-        totalPhotos: Int!
-    }
-
-    type Mutation {
-        postPhoto(
-            name: String! 
-            description: String 
-            category: PhotoCategory=PORTRAIT
-        ): Photo!
-    }
-
-`
-```
-
-### Test with Query Variables
-
-```graphql
-query countPhotos {
-  totalPhotos
-}
-
-mutation addPhoto(
-  $name: String! 
-  $description: String
-  $category:PhotoCategory
-) {
-  postPhoto(
-    name:$name 
-    description:$description
-    category:$category
-  ) {
-    id
-    name
-    description
-    category
-  }
-}
-```
+`npm i nodemon -D`
 
 ```json
-{
-  "name": "Stick the Landing",
-  "description": "Glen going big at Mammoth",
-  "category": "ACTION"
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
+
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
+
+```javascript
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
+}
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
+```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
