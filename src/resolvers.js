@@ -1,35 +1,33 @@
-const { ObjectID } = require('mongodb')
-const { authorizeWithGithub, generateFakeUsers } = require('./lib')
+const { generate } = require('short-id')
+
+const photos = require('../data/photos')
+const users = require('../data/users')
 
 module.exports = {
 
     Query: {
-        me: (parent, args, { currentUser }) => currentUser,
-        totalPhotos: (parent, args, { photos }) => photos.countDocuments(),
-        allPhotos: (parent, args, { photos }) => photos.find().toArray(),
-        Photo: (parent, { id }, { photos }) => photos.findOne({ _id: ObjectID(id) }),
-        totalUsers: (parent, args, { users }) => users.countDocuments(),
-        allUsers: (parent, args, { users }) => users.find().toArray(),
-        User: (parent, { githubLogin }, { users }) => users.findOne({ githubLogin })
+        totalPhotos: () => photos.length,
+        allPhotos: () => photos,
+        Photo: (parent, { id }) => photos.find(p => p.id === id),
+        totalUsers: () => users.length,
+        allUsers: () => users,
+        User: (parent, { id }) => users.find(p => p.id === id)
     },
 
     Mutation: {
-        postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
+        postPhoto: (parent, { input }, { currentUser }) => {
 
             if (!currentUser) {
-                throw new Error('only an authorized user can post a photo')
+                throw new Error(`Only authorized users can post photos`)
             }
-        
-            const newPhoto = {
-                ...input,
-                userID: currentUser.githubLogin
-            }
-        
-            const { insertedId } = await photos.insertOne(newPhoto)
-            newPhoto.id = insertedId.toString()
-        
-            pubsub.publish('photo-added', { newPhoto })
 
+            const id = generate()
+            const newPhoto = { 
+                id, 
+                ...input,
+                userID: currentUser.id 
+            }
+            photos.push(newPhoto)
             return newPhoto
     
         },
@@ -89,13 +87,12 @@ module.exports = {
     },
 
     Photo: {
-        id: parent => parent.id || parent._id.toString(),
         url: parent => `/img/photos/${parent.id}.jpg`,
-        postedBy: (parent, args, { users }) => users.findOne({ githubLogin: parent.userID })
+        postedBy: parent => users.find(u => u.id === parent.userID)
     },
 
     User: {
-        postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
+        postedPhotos: parent => photos.filter(p => p.userID === parent.id)
     }
 
 }

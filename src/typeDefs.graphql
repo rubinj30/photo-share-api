@@ -15,20 +15,18 @@ type Photo {
 }
 
 type User {
-    githubLogin: ID!
+    id: ID!
     name: String!
-    avatar: String!
     postedPhotos: [Photo!]!
 }
 
 type Query {
-    me: User
     totalPhotos: Int!
     allPhotos: [Photo!]!
     Photo(id:ID!): Photo
     totalUsers: Int!
     allUsers: [User!]!
-    User(githubLogin:ID!): User
+    User(id:ID!): User
 }
 
 input PostPhotoInput {
@@ -37,17 +35,6 @@ input PostPhotoInput {
     category: PhotoCategory=PORTRAIT
 }
 
-type AuthPayload {
-    token: String!
-    user: User!
-}
-
 type Mutation {
     postPhoto(input: PostPhotoInput!): Photo!
-    githubAuth(code: String!): AuthPayload!
-}
-
-type Subscription {
-    newUser: User!
-    newPhoto: Photo!
 }
