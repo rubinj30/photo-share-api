@@ -5,58 +5,52 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Change the index.js
+### Create a Package.json
 
-```javascript
-const context = {
-    currentUser: users.find(u => u.name === "Glen Plake")
-}
+`npm init -y`
 
-const server = new ApolloServer({ typeDefs, resolvers, context })
-```
-
-### Test with a Query
-
-```graphql
-query photos($id: ID!) {
-  User(id: $id) {
-    name
-    postedPhotos {
-      name
-      url
-    }
-  }
-}
-
-mutation post($input:PostPhotoInput!) {
-  postPhoto(input:$input) {
-    id
-    url
-    postedBy {
-      name
-    }
-  }
-}
-```
+`npm i nodemon -D`
 
 ```json
-{
-  "id":"b",
-  "input": {
-    "name": "Sick Turns",
-  	"description": "Carving big turns in the deep powder.",
-  	"category": "ACTION"
-  }
+"scripts": {
+    "start": "nodemon ./src/index.js"
 }
 ```
 
-### Test the Error: Change the currentUser in index.js
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-const context = {
-    currentUser: null
+const { ApolloServer } = require('apollo-server')
+
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
+
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
 }
+
+const server = new ApolloServer({ typeDefs, resolvers })
+
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
 
 
 Iterations
