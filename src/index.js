@@ -3,10 +3,18 @@ const { generate } = require('short-id')
 
 const typeDefs = `
 
+    enum PhotoCategory {
+        PORTRAIT
+        LANDSCAPE
+        ACTION
+        GRAPHIC
+    }
+
     type Photo {
         id: ID!
         name: String!
         description: String
+        category: PhotoCategory!
     }
 
     type Query {
@@ -14,7 +22,11 @@ const typeDefs = `
     }
 
     type Mutation {
-        postPhoto(name: String! description: String): Photo!
+        postPhoto(
+            name: String! 
+            description: String 
+            category: PhotoCategory=PORTRAIT
+        ): Photo!
     }
 
 `
