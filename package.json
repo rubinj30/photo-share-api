@@ -4,17 +4,12 @@
   "description": "PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.graphqlworkshop.com). In this exercise, students build a GraphQL API for a small photo sharing application.",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon -r dotenv/config ./src/index.js"
+    "start": "nodemon ./src/index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "nodemon": "^1.18.4"
-  },
-  "dependencies": {
-    "dotenv": "^6.0.0",
-    "mongodb": "^3.1.5",
-    "short-id": "0.1.0-1"
   }
 }
