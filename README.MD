@@ -5,47 +5,53 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Install express and friends
+### Create a Package.json
 
-`npm i express`
+`npm init -y`
 
-`npm i apollo-server-express`
+`npm i nodemon -D`
 
-`npm i graphql-playground-middleware-express`
+```json
+"scripts": {
+    "start": "nodemon ./src/index.js"
+}
+```
 
-### Completely Change index.js
+### Install Apollo Server
+
+`npm i apollo-server graphql`
+
+### Add an index.js file
 
 ```javascript
-const express = require('express')
-const expressPlayground = require('graphql-playground-middleware-express').default
-const { ApolloServer } = require('apollo-server-express')
+const { ApolloServer } = require('apollo-server')
 
-...
+const typeDefs = `
+    type Query {
+        gnar: String
+    }
+`
 
-const start = async (port) => {
-
-    ...
-    
-    const server = new ApolloServer({ typeDefs, resolvers, context })
-    
-    const app = express()
-    server.applyMiddleware({app})
-
-    app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
-
-    app.get('/', (req, res) => {
-        res.end(`Welcome to the Photo Share API`)
-    })
-
-    app.listen({ port }, () => {
-        console.log(`photo-share api running on port ${port}`)
-    })
-
+const resolvers = {
+    Query: {
+        gnar: () => 'gnarly!!!'
+    }
 }
 
-start(process.env.PORT || 4000)
+const server = new ApolloServer({ typeDefs, resolvers })
 
+server.listen()
+    .then(({port}) => `server listening on ${port}`)
+    .then(console.log)
+    .catch(console.error)
 ```
+
+### Start the Server
+
+`npm start`
+
+Browse [http://localhost:4000](http://localhost:4000)
+
 
 Iterations
 ---------------
