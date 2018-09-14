@@ -6,13 +6,31 @@ Changes
 ---------------
 Within the data folder you will find sample json data for __Photos__ and __Users__. We need to initialize the app with the sample data found in this file. Once added, we need to add the necessary types, queries, and resolvers to make the user data accessible with out GraphQL Service.
 
-### Count photos in index.js
+### Install short-id
+
+`npm i short-id`
+
+### Change index.js
 
 ```javascript
+const { generate } = require('short-id')
+
 const typeDefs = `
+
+    type Photo {
+        id: ID!
+        name: String!
+        description: String
+    }
+
     type Query {
         totalPhotos: Int!
     }
+
+    type Mutation {
+        postPhoto(name: String!, description: String): Photo!
+    }
+
 `
 
 const photos = []
@@ -20,7 +38,31 @@ const photos = []
 const resolvers = {
     Query: {
         totalPhotos: () => photos.length
+    },
+    Mutation: {
+        postPhoto: (parent, args) => {
+            const id = generate()
+            const newPhoto = { id, ...args }
+            photos.push(newPhoto)
+            return newPhoto
+        }
     }
+}
+```
+
+### Test Queries
+
+```graphql
+query countPhotos {
+  totalPhotos
+}
+
+mutation addPhoto {
+  postPhoto(name:"Tahoe Sunset") {
+    id
+    name
+    description
+  }
 }
 ```
 
@@ -35,7 +77,7 @@ Iterations
 ### b. The Photo Type
 
 1. [x] Counting the Photos 
-2. [ ] Posting a Photo 
+2. [x] Posting a Photo 
 3. [ ] Handling Photo Categories 
 4. [ ] Using an Input Type 
 5. [ ] Listing All Photos 
