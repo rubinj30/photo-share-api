@@ -15,9 +15,8 @@ type Photo {
 }
 
 type User {
-    githubLogin: ID!
+    id: ID!
     name: String!
-    avatar: String!
     postedPhotos: [Photo!]!
 }
 
