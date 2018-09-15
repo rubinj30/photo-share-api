@@ -77,11 +77,11 @@ Iterations
 4. [x] Configure Github OAuth
 5. [ ] Add `githubLogin` mutation
 6. [ ] Add fake users to `githubLogin` mutation
-7. [ ] Post new Photos to the Database
+7. [ ] Identify the `currentUser`
+8. [ ] Post new Photos to the Database
 
-### e. Subscriptions and Files
+### e. Subscriptions and Custom Scalars
 
 1. [ ] Adding Subscription Support 
-2. [ ] Publishing Events 
-3. [ ] Modifying the Schema to Support File Uploads 
-4. [ ] Uploading File with postPhoto 
+2. [ ] Uploading File with postPhoto 
+3. [ ] Adding custom scalar for `DateTime`
