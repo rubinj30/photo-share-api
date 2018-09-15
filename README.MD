@@ -101,4 +101,4 @@ Iterations
 
 1. [x] Adding Subscription Support 
 2. [x] Uploading File with postPhoto 
-3. [x] Adding custom scalar for `DateTime`
+3. [ ] Adding custom scalar for `DateTime`
