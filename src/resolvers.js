@@ -1,10 +1,7 @@
 const { generate } = require('short-id')
+const { authorizeWithGithub } = require('./lib')
 
 const photos = require('../data/photos')
-const users = require('../data/users')
-
-console.log('client id: ', process.env.GITHUB_CLIENT_ID)
-console.log('client secret: ', process.env.GITHUB_CLIENT_SECRET)
 
 module.exports = {
 
@@ -12,9 +9,9 @@ module.exports = {
         totalPhotos: () => photos.length,
         allPhotos: () => photos,
         Photo: (parent, { id }) => photos.find(p => p.id === id),
-        totalUsers: () => users.length,
-        allUsers: () => users,
-        User: (parent, { id }) => users.find(p => p.id === id)
+        totalUsers: (parent, args, { users }) => users.countDocuments(),
+        allUsers: (parent, args, { users }) => users.find().toArray(),
+        User: (parent, { githubLogin }, { users }) => users.findOne({ githubLogin })
     },
 
     Mutation: {
@@ -32,6 +29,34 @@ module.exports = {
             }
             photos.push(newPhoto)
             return newPhoto
+        },
+        githubAuth: async (parent, { code }, { users }) => {
+
+            const payload = await authorizeWithGithub({
+                client_id: process.env.GITHUB_CLIENT_ID,
+                client_secret: process.env.GITHUB_CLIENT_SECRET,
+                code
+            })
+
+            if (payload.message) {
+                throw new Error(payload.message)
+            }
+
+            const githubUserInfo = {
+                githubLogin: payload.login,
+                name: payload.name,
+                avatar: payload.avatar_url,
+                githubToken: payload.access_token
+            }
+
+            const { ops:[user] } = await users.replaceOne(
+                { githubLogin: payload.login }, 
+                githubUserInfo, 
+                { upsert: true }
+            )
+
+            return { user, token: user.githubToken }
+            
         }
     },
 
