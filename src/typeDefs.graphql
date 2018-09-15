@@ -1,9 +1,11 @@
+scalar DateTime
+
 enum PhotoCategory {
-        PORTRAIT
-        LANDSCAPE
-        ACTION
-        GRAPHIC
-    }
+    PORTRAIT
+    LANDSCAPE
+    ACTION
+    GRAPHIC
+}
 
 type Photo {
     id: ID!
@@ -12,6 +14,7 @@ type Photo {
     description: String
     category: PhotoCategory!
     postedBy: User!
+    created: DateTime!
 }
 
 type User {

@@ -1,6 +1,7 @@
 const { ObjectID } = require('mongodb')
 const { authorizeWithGithub, generateFakeUsers, uploadFile } = require('./lib')
 const path = require('path')
+const { GraphQLScalarType } = require('graphql')
 
 module.exports = {
 
@@ -27,7 +28,8 @@ module.exports = {
         
             const newPhoto = {
                 ...input,
-                userID: currentUser.githubLogin
+                userID: currentUser.githubLogin,
+                created: new Date()
             }
         
             const { insertedId } = await photos.insertOne(newPhoto)
@@ -102,6 +104,14 @@ module.exports = {
 
     User: {
         postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
-    }
+    },
+
+    DateTime: new GraphQLScalarType({
+        name: 'DateTime',
+        description: 'A valid date time value.',
+        parseValue: value => new Date(value),
+        serialize: value => new Date(value).toISOString(),
+        parseLiteral: ast => ast.value
+    })
 
 }
