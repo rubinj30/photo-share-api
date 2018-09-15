@@ -5,50 +5,45 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-<<<<<<< HEAD
-### Install express and friends
+### Create a Github OAuth App
 
-`npm i express`
+__.env__
+```
+DB_HOST=mongodb://localhost:27017/photo-share
+GITHUB_CLIENT_ID=<YOUR_CLIENT_ID>
+GITHUB_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+```
 
-`npm i apollo-server-express`
+### Log the env variables
 
-`npm i graphql-playground-middleware-express`
-
-### Completely Change index.js
-
+__resolvers.js__
 ```javascript
-const express = require('express')
-const expressPlayground = require('graphql-playground-middleware-express').default
-const { ApolloServer } = require('apollo-server-express')
+const { generate } = require('short-id')
+
+const photos = require('../data/photos')
+const users = require('../data/users')
+
+console.log('client id: ', process.env.GITHUB_CLIENT_ID)
+console.log('client secret: ', process.env.GITHUB_CLIENT_SECRET)
 
 ...
 
-const start = async (port) => {
-
-    ...
-    
-    const server = new ApolloServer({ typeDefs, resolvers, context })
-    
-    const app = express()
-    server.applyMiddleware({app})
-
-    app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
-
-    app.get('/', (req, res) => {
-        res.end(`Welcome to the Photo Share API`)
-    })
-
-    app.listen({ port }, () => {
-        console.log(`photo-share api running on port ${port}`)
-    })
-
-}
-
-start(process.env.PORT || 4000)
-
 ```
-=======
->>>>>>> adds github OAuth
+
+### Modify the Index to Request a Github Code
+
+```javascript
+app.get('/', (req, res) => {
+    let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
+    res.end(`
+        <h1>Welcome to the Photo Share API</h1>
+        <a href="${url}">Request a GitHub Code</a>
+    `)
+})
+```
+
+### Test by obtaining a github code
+Click the link on `http://localhost:4000`. You should be redirected to `http://localhost:3000?code=XYZ` with the code passed back from github via a query string.
 
 Iterations
 ---------------
