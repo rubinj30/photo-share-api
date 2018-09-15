@@ -14,7 +14,7 @@ module.exports = {
     },
 
     Mutation: {
-        postPhoto: async (parent, { input }, { photos, currentUser }) => {
+        postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
 
             if (!currentUser) {
                 throw new Error('only an authorized user can post a photo')
@@ -28,10 +28,12 @@ module.exports = {
             const { insertedId } = await photos.insertOne(newPhoto)
             newPhoto.id = insertedId.toString()
         
+            pubsub.publish('photo-added', { newPhoto })
+
             return newPhoto
     
         },
-        githubAuth: async (parent, { code }, { users }) => {
+        githubAuth: async (parent, { code }, { users, pubsub }) => {
 
             let payload
 
@@ -68,8 +70,19 @@ module.exports = {
                 { upsert: true }
             )
 
+            pubsub.publish('user-added', { newUser: user })
+
             return { user, token: user.githubToken }
             
+        }
+    },
+
+    Subscription: {
+        newPhoto: {
+            subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('photo-added')
+        },
+        newUser: {
+            subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('user-added')
         }
     },
 
