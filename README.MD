@@ -84,7 +84,7 @@ Iterations
 1. [x] Challenge: Adding the User Type
 2. [x] Connecting Photos to Users
 3. [ ] Connecting Users to Photos
-4. [ ] Requiring a User to Post a Photo
+4. [ ] Adding currentUser to context
 
 ### d. Context
 
