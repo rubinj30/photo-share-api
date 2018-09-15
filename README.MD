@@ -5,68 +5,46 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Move typeDefs to typeDefs.graphql
+### Install express and friends
 
-__index.js__
+`npm i express`
+
+`npm i apollo-server-express`
+
+`npm i graphql-playground-middleware-express`
+
+### Completely Change index.js
+
 ```javascript
-const { readFileSync } = require('fs')
-const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
-```
-
-### Move resolvers to resolvers.js
-
-__resolvers.js__
-```javascript
-const { generate } = require('short-id')
-
-const photos = require('../data/photos')
-const users = require('../data/users')
-
-module.exports = {
-    Query: { ... },
-    Mutation: { ... },
-    Photo: { ... },
-    User: { ... }
-}
-```
-
-__index.js__
-* [ ] Remove photos, users, and short-id/generate
-```javascript
-const resolvers = require('./resolvers')
-```
-
-### Add Environment variables
-
-* [ ] Add `.env` file: `DB_HOST=mongodb://localhost:27017/photo-share`
-* [ ] Add `.env` to `.gitignore`
-* [ ] Install `dotenv`: `npm i dotenv`
-* [ ] Modify `start` script in `package.json`.
-* [ ] Log the `process.env.DB_HOST` to make sure environment vars are working
-* [ ] Start the app: `npm start`
-
-__package.json__
-```json
-"scripts": {
-  "start": "nodemon -r dotenv/config ./src/index.js"
-}
-```
-
-__index.js__
-```javascript
-const { ApolloServer } = require('apollo-server')
-const { readFileSync } = require('fs')
-
-const resolvers = require('./resolvers')
-const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
-
-console.log('database host: ', process.env.DB_HOST)
-
-const context = {
-    currentUser: null
-}
+const express = require('express')
+const expressPlayground = require('graphql-playground-middleware-express').default
+const { ApolloServer } = require('apollo-server-express')
 
 ...
+
+const start = async (port) => {
+
+    ...
+    
+    const server = new ApolloServer({ typeDefs, resolvers, context })
+    
+    const app = express()
+    server.applyMiddleware({app})
+
+    app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
+
+    app.get('/', (req, res) => {
+        let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
+        res.end(`<a href="${url}">Sign In with Github</a>`)
+    })
+
+    app.listen({ port }, () => {
+        console.log(`photo-share api running on port ${port}`)
+    })
+
+}
+
+start(process.env.PORT || 4000)
 
 ```
 
@@ -98,7 +76,7 @@ Iterations
 
 1. [x] Add environment and refactor
 2. [x] Configuring a Database
-3. [ ] Configure an express server
+3. [x] Configure an express server
 4. [ ] Configure Github OAuth
 5. [ ] Add `githubLogin` mutation
 6. [ ] Add fake users to `githubLogin` mutation
