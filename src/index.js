@@ -26,7 +26,11 @@ const start = async (port) => {
     app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
 
     app.get('/', (req, res) => {
-        res.end(`Welcome to the Photo Share API`)
+        let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
+        res.end(`
+            <h1>Welcome to the Photo Share API</h1>
+            <a href="${url}">Request a GitHub Code</a>
+        `)
     })
 
     app.listen({ port }, () => {
