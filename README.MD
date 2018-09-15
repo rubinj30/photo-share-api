@@ -99,7 +99,7 @@ Iterations
 7. [x] Identify the `currentUser`
 8. [x] Post new Photos to the Database
 
-### e. Subscriptions and Files
+### e. Subscriptions and Custom Scalars
 
 1. [x] Adding Subscription Support 
 2. [x] Uploading File with postPhoto 
