@@ -34,8 +34,9 @@ Iterations
 ### c. The User Type
 
 1. [x] Challenge: Adding the User Type
-2. [ ] Connecting Users to Photos
-3. [ ] Connecting Photos to Users
+2. [ ] Connecting Photos to Users
+3. [ ] Connecting Users to Photos
+4. [ ] Adding currentUser to context
 
 ### d. Context
 
