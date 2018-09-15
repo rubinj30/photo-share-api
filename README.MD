@@ -5,45 +5,111 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Create a Github OAuth App
+### Modify Schema for Github User Auth
 
-__.env__
-```
-DB_HOST=mongodb://localhost:27017/photo-share
-GITHUB_CLIENT_ID=<YOUR_CLIENT_ID>
-GITHUB_CLIENT_SECRET=<YOUR_CLIENT_SECRET>
+__Modify the user type__
+```graphql
+type User {
+    githubLogin: ID!
+    name: String!
+    avatar: String!
+    postedPhotos: [Photo!]!
+}
 ```
 
-### Log the env variables
+__Modify the User Query__
+```graphql
+type Query {
+    ...
+    User(githubLogin:ID!): User
+}
+```
+
+__Add the Mutation__
+```graphql
+type AuthPayload {
+    token: String!
+    user: User!
+}
+
+type Mutation {
+    postPhoto(input: PostPhotoInput!): Photo!
+    githubAuth(code: String!): AuthPayload!
+}
+```
+
+### Modify the Query Resolvers
+
+* [ ] Remove: `const photos = require('../data/photos')`
+* [ ] Resolver Query users with __users__ collection
 
 __resolvers.js__
 ```javascript
 const { generate } = require('short-id')
 
 const photos = require('../data/photos')
-const users = require('../data/users')
 
-console.log('client id: ', process.env.GITHUB_CLIENT_ID)
-console.log('client secret: ', process.env.GITHUB_CLIENT_SECRET)
+module.exports = {
+
+    Query: {
+        ...
+
+        totalUsers: (parent, args, { users }) => users.countDocuments(),
+        allUsers: (parent, args, { users }) => users.find().toArray(),
+        User: (parent, { githubLogin }, { users }) => users.findOne({ githubLogin })
+    
+    },
+```
+
+### Add the githubLogin Mutation
+
+__resolvers.js__
+```javascript
+const { authorizeWithGithub } = require('./lib')
 
 ...
 
+module.exports = {
+
+    ...
+
+    Mutation: {
+        githubAuth: async (parent, { code }, { users }) => {
+
+            const payload = await authorizeWithGithub({
+                client_id: process.env.GITHUB_CLIENT_ID,
+                client_secret: process.env.GITHUB_CLIENT_SECRET,
+                code
+            })
+
+            if (payload.message) {
+                throw new Error(payload.message)
+            }
+
+            const githubUserInfo = {
+                githubLogin: payload.login,
+                name: payload.name,
+                avatar: payload.avatar_url,
+                githubToken: payload.access_token
+            }
+
+            const { ops:[user] } = await users.replaceOne(
+                { githubLogin: payload.login }, 
+                githubUserInfo, 
+                { upsert: true }
+            )
+
+            return { user, token: user.githubToken }
+            
+        }
+    }
+
+    ...
+    
+}    
+
 ```
 
-### Modify the Index to Request a Github Code
-
-```javascript
-app.get('/', (req, res) => {
-    let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
-    res.end(`
-        <h1>Welcome to the Photo Share API</h1>
-        <a href="${url}">Request a GitHub Code</a>
-    `)
-})
-```
-
-### Test by obtaining a github code
-Click the link on `http://localhost:4000`. You should be redirected to `http://localhost:3000?code=XYZ` with the code passed back from github via a query string.
 
 Iterations
 ---------------
@@ -75,7 +141,7 @@ Iterations
 2. [x] Configuring a Database
 3. [x] Configure an express server
 4. [x] Configure Github OAuth
-5. [ ] Add `githubLogin` mutation
+5. [x] Add `githubLogin` mutation
 6. [ ] Add fake users to `githubLogin` mutation
 7. [ ] Post new Photos to the Database
 

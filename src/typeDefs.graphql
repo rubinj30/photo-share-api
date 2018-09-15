@@ -15,8 +15,9 @@ type Photo {
 }
 
 type User {
-    id: ID!
+    githubLogin: ID!
     name: String!
+    avatar: String!
     postedPhotos: [Photo!]!
 }
 
@@ -26,7 +27,7 @@ type Query {
     Photo(id:ID!): Photo
     totalUsers: Int!
     allUsers: [User!]!
-    User(id:ID!): User
+    User(githubLogin:ID!): User
 }
 
 input PostPhotoInput {
