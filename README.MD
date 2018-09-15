@@ -8,7 +8,8 @@ Contents
 * [Helper Library](src/lib.js) - A library of helper functions
 * [Sample Data - Photos](data/photos.json) - Sample JSON data for Photos
 * [Sample Data - Users](data/users.json) - Sample JSON data for Users
-* [Test Upload Page](test-upload.html) - A page to test uploading files
+* [Test Upload Page](assets/photos/test-upload.html) - A page to test uploading files
+
 
 Iterations
 ---------------
@@ -29,34 +30,24 @@ Iterations
 
 ### c. The User Type
 
-1. [ ] Adding the User Type 
-2. [ ] Adding Some Sample Data
-3. [ ] Listing All Users
-4. [ ] Querying a Single User
-5. [ ] Add User to postPhoto Mutation
-6. [ ] Adding postedBy Connection
-7. [ ] Adding postedPhotos
+1. [ ] Challenge: Adding the User Type
+2. [ ] Connecting Photos to Users
+3. [ ] Connecting Users to Photos
+4. [ ] Adding currentUser to context
 
-### e. Database and Context
+### d. Context
 
-1. [ ] Environment Variables
-2. [ ] Adding a Database Connection to Context
-3. [ ] Querying Data 
-4. [ ] Posting Photos to the Database
+1. [ ] Add environment and refactor
+2. [ ] Configuring a Database
+3. [ ] Configure an express server
+4. [ ] Configure Github OAuth
+5. [ ] Add `githubLogin` mutation
+6. [ ] Add fake users to `githubLogin` mutation
+7. [ ] Identify the `currentUser`
+8. [ ] Post new Photos to the Database
 
-### f. Github Authorization
-
-1. [ ] Environment Variables 
-2. [ ] Adding Github Authorization Mutation 
-3. [ ] Authorizing with Github 
-4. [ ] Authorizing Fake Users 
-
-### g. Subscriptions
+### e. Subscriptions and Custom Scalars
 
 1. [ ] Adding Subscription Support 
-2. [ ] Publishing Events 
-
-### h. File Uploads
-
-1. [ ] Modifying the Schema to Support File Uploads 
 2. [ ] Uploading File with postPhoto 
+3. [ ] Adding custom scalar for `DateTime`
