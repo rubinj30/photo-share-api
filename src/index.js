@@ -1,6 +1,7 @@
 const express = require('express')
+const { createServer } = require('http')
 const expressPlayground = require('graphql-playground-middleware-express').default
-const { ApolloServer } = require('apollo-server-express')
+const { ApolloServer, PubSub } = require('apollo-server-express')
 const { readFileSync } = require('fs')
 const { MongoClient } = require('mongodb')
 
@@ -11,21 +12,25 @@ const start = async (port) => {
 
     const client = await MongoClient.connect(process.env.DB_HOST, { useNewUrlParser: true })
     const db = client.db()
+    const pubsub = new PubSub()
 
-    const context = async ({req}) => {
+    const context = async ({ req, connection }) => {
         const photos = db.collection('photos')
         const users = db.collection('users')
-        const githubToken = req.headers.authorization
+        const githubToken = req ? req.headers.authorization : connection.context.Authorization
         const currentUser = await users.findOne({ githubToken })
-        return { photos, users, currentUser }
+        return { photos, users, currentUser, pubsub }
     }
     
     const server = new ApolloServer({ typeDefs, resolvers, context })
     
     const app = express()
     server.applyMiddleware({app})
-
-    app.get('/playground', expressPlayground({ endpoint: '/graphql' }))
+    
+    app.get('/playground', expressPlayground({ 
+        endpoint: '/graphql',
+        subscriptionEndpoint: '/graphql' 
+    }))
 
     app.get('/', (req, res) => {
         let url = `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&scope=user`
@@ -35,7 +40,10 @@ const start = async (port) => {
         `)
     })
 
-    app.listen({ port }, () => {
+    const httpServer = createServer(app)
+    server.installSubscriptionHandlers(httpServer)
+
+    httpServer.listen({ port }, () => {
         console.log(`photo-share api running on port ${port}`)
     })
 
