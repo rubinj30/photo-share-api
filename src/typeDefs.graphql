@@ -35,6 +35,7 @@ input PostPhotoInput {
     name: String! 
     description: String 
     category: PhotoCategory=PORTRAIT
+    file: Upload!
 }
 
 type AuthPayload {

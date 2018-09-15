@@ -4,6 +4,7 @@ const expressPlayground = require('graphql-playground-middleware-express').defau
 const { ApolloServer, PubSub } = require('apollo-server-express')
 const { readFileSync } = require('fs')
 const { MongoClient } = require('mongodb')
+const path = require('path')
 
 const resolvers = require('./resolvers')
 const typeDefs = readFileSync('src/typeDefs.graphql', 'UTF-8')
@@ -39,6 +40,11 @@ const start = async (port) => {
             <a href="${url}">Request a GitHub Code</a>
         `)
     })
+
+    app.use(
+        '/img/photos',
+        express.static(path.join(__dirname, '..', 'assets', 'photos'))
+    )
 
     const httpServer = createServer(app)
     server.installSubscriptionHandlers(httpServer)

@@ -1,3 +1,4 @@
+assets/photos/*.jpg
 node_modules/
 .env
 assets/photos/*.jpg
