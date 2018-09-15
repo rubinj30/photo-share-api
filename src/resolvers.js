@@ -6,6 +6,7 @@ const photos = require('../data/photos')
 module.exports = {
 
     Query: {
+        me: (parent, args, { currentUser }) => currentUser,
         totalPhotos: () => photos.length,
         allPhotos: () => photos,
         Photo: (parent, { id }) => photos.find(p => p.id === id),
