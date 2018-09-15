@@ -5,6 +5,7 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
+<<<<<<< HEAD
 ### Install express and friends
 
 `npm i express`
@@ -46,6 +47,8 @@ const start = async (port) => {
 start(process.env.PORT || 4000)
 
 ```
+=======
+>>>>>>> adds github OAuth
 
 Iterations
 ---------------
@@ -76,7 +79,7 @@ Iterations
 1. [x] Add environment and refactor
 2. [x] Configuring a Database
 3. [x] Configure an express server
-4. [ ] Configure Github OAuth
+4. [x] Configure Github OAuth
 5. [ ] Add `githubLogin` mutation
 6. [ ] Add fake users to `githubLogin` mutation
 7. [ ] Post new Photos to the Database
