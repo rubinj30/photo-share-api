@@ -14,6 +14,7 @@
   },
   "dependencies": {
     "dotenv": "^6.0.0",
+    "mongodb": "^3.1.5",
     "short-id": "0.1.0-1"
   }
 }
