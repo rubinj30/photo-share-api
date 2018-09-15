@@ -94,14 +94,18 @@ Iterations
 3. [x] Connecting Users to Photos
 4. [x] Adding currentUser to context
 
-### d. Database and Context
+### d. Context
 
 1. [x] Add environment and refactor
-2. [ ] Restructuring Queries
-3. [ ] Restructuring Mutations
+2. [x] Configuring a Database
+3. [ ] Configure Github OAuth
+4. [ ] Add `githubLogin` mutation
+5. [ ] Add fake users to `githubLogin` mutation
+6. [ ] Post new Photos to the Database
 
-### e. Subscriptions and Custom Scalars
+### e. Subscriptions and Files
 
 1. [ ] Adding Subscription Support 
-2. [ ] Uploading File with postPhoto 
-3. [ ] Adding custom scalar for `DateTime`
+2. [ ] Publishing Events 
+3. [ ] Modifying the Schema to Support File Uploads 
+4. [ ] Uploading File with postPhoto 
