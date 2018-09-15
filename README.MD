@@ -5,60 +5,57 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Modify the Schema
+### Import Object ID
 
-```graphql
-type Query {
-    me: User
-    ...
-}
-```
+* [ ] Remove `const photos = require('../data/photos')`
 
-### Modify Context
-
-__index.js__
 ```javascript
-const context = async ({req}) => {
-    const photos = db.collection('photos')
-    const users = db.collection('users')
-    const githubToken = req.headers.authorization
-    const currentUser = await users.findOne({ githubToken })
-    return { photos, users, currentUser }
-}
+const { ObjectID } = require('mongodb')
 ```
 
-### Test
+### Modify postPhoto Mutation
 
-```graphql
-query currentUser {
-  me {
-    name
-  }
-}
+```javascript
+postPhoto: async (parent, { input }, { photos, currentUser }) => {
 
-mutation authorize {
-  githubAuth(code:"TEST") {
-    token 
-    user {
-      ...person
+    if (!currentUser) {
+        throw new Error('only an authorized user can post a photo')
     }
-  }
-}
 
-fragment person on User {
-  name
-  githubLogin
-  avatar
-  postedPhotos {
-    name
-  }
+    const newPhoto = {
+        ...input,
+        userID: currentUser.githubLogin
+    }
+
+    const { insertedId } = await photos.insertOne(newPhoto)
+    newPhoto.id = insertedId.toString()
+
+    return newPhoto
+
 }
 ```
 
-__HTTP Headers__
-```json
-{
-  "Authorization": "d4ef0d880dc3bfd4d445fb6a8c9674d6ebd86935"
+### Modify Query Resolvers
+
+```javascript
+Query: {        
+    totalPhotos: (parent, args, { photos }) => photos.countDocuments(),
+    allPhotos: (parent, args, { photos }) => photos.find().toArray(),
+    Photo: (parent, { id }, { photos }) => photos.findOne({ _id: ObjectID(id) }),
+    ...
+},
+```
+
+### Modify Type Resolvers
+
+```javascript
+Photo: {
+    ...
+    postedBy: (parent, args, { users }) => users.findOne({ githubLogin: parent.userID })
+},
+
+User: {
+    postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
 }
 ```
 
@@ -95,7 +92,7 @@ Iterations
 5. [x] Add `githubLogin` mutation
 6. [x] Add fake users to `githubLogin` mutation
 7. [x] Identify the `currentUser`
-8. [ ] Post new Photos to the Database
+8. [x] Post new Photos to the Database
 
 ### e. Subscriptions and Files
 
