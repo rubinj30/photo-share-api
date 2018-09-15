@@ -15,8 +15,9 @@ type Photo {
 }
 
 type User {
-    id: ID!
+    githubLogin: ID!
     name: String!
+    avatar: String!
     postedPhotos: [Photo!]!
 }
 
@@ -35,6 +36,12 @@ input PostPhotoInput {
     category: PhotoCategory=PORTRAIT
 }
 
+type AuthPayload {
+    token: String!
+    user: User!
+}
+
 type Mutation {
     postPhoto(input: PostPhotoInput!): Photo!
+    githubAuth(code: String!): AuthPayload!
 }
