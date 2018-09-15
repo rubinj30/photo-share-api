@@ -94,11 +94,16 @@ Iterations
 3. [x] Connecting Users to Photos
 4. [x] Adding currentUser to context
 
-### d. Database and Context
+### d. Context
 
 1. [x] Add environment and refactor
-2. [ ] Restructuring Queries
-3. [ ] Restructuring Mutations
+2. [ ] Configuring a Database
+3. [ ] Configure an express server
+4. [ ] Configure Github OAuth
+5. [ ] Add `githubLogin` mutation
+6. [ ] Add fake users to `githubLogin` mutation
+7. [ ] Identify the `currentUser`
+8. [ ] Post new Photos to the Database
 
 ### e. Subscriptions and Custom Scalars
 
