@@ -5,49 +5,38 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Modify the githubAuth Resolver
+### Modify the Schema
 
-```javascript
-const { authorizeWithGithub, generateFakeUsers } = require('./lib')
-```
-
-```javascript
-githubAuth: async (parent, { code }, { users }) => {
-
-    let payload
-
-    if (code === 'TEST') {
-        const { results:[fakeUser] } = await generateFakeUsers(1)
-        payload = {
-            login: fakeUser.login.username,
-            name: `${fakeUser.name.first} ${fakeUser.name.last}`,
-            avatar_url: fakeUser.picture.thumbnail,
-            access_token: fakeUser.login.sha1 
-        }
-    } else {
-        payload = await authorizeWithGithub({
-            client_id: process.env.GITHUB_CLIENT_ID,
-            client_secret: process.env.GITHUB_CLIENT_SECRET,
-            code
-        })
-    }
-    
-   ...
-    
+```graphql
+type Query {
+    me: User
+    ...
 }
 ```
 
-### Add Some Test Users
+### Modify Context
+
+__index.js__
+```javascript
+const context = async ({req}) => {
+    const photos = db.collection('photos')
+    const users = db.collection('users')
+    const githubToken = req.headers.authorization
+    const currentUser = await users.findOne({ githubToken })
+    return { photos, users, currentUser }
+}
+```
+
+### Test
 
 ```graphql
-query users {
-  totalUsers
-  allUsers {
-    ...person
+query currentUser {
+  me {
+    name
   }
 }
 
-mutation addTestUser {
+mutation authorize {
   githubAuth(code:"TEST") {
     token 
     user {
@@ -63,6 +52,13 @@ fragment person on User {
   postedPhotos {
     name
   }
+}
+```
+
+__HTTP Headers__
+```json
+{
+  "Authorization": "d4ef0d880dc3bfd4d445fb6a8c9674d6ebd86935"
 }
 ```
 
@@ -98,7 +94,8 @@ Iterations
 4. [x] Configure Github OAuth
 5. [x] Add `githubLogin` mutation
 6. [x] Add fake users to `githubLogin` mutation
-7. [ ] Post new Photos to the Database
+7. [x] Identify the `currentUser`
+8. [ ] Post new Photos to the Database
 
 ### e. Subscriptions and Files
 
