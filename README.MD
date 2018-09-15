@@ -94,9 +94,8 @@ Iterations
 7. [x] Identify the `currentUser`
 8. [x] Post new Photos to the Database
 
-### e. Subscriptions and Files
+### e. Subscriptions and Custom Scalars
 
 1. [ ] Adding Subscription Support 
-2. [ ] Publishing Events 
-3. [ ] Modifying the Schema to Support File Uploads 
-4. [ ] Uploading File with postPhoto 
+2. [ ] Uploading File with postPhoto 
+3. [ ] Adding custom scalar for `DateTime`
