@@ -1,5 +1,5 @@
 const { generate } = require('short-id')
-const { authorizeWithGithub } = require('./lib')
+const { authorizeWithGithub, generateFakeUsers } = require('./lib')
 
 const photos = require('../data/photos')
 
