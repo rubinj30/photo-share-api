@@ -14,7 +14,7 @@ module.exports = {
     },
 
     Mutation: {
-        postPhoto: async (parent, { input }, { photos, currentUser }) => {
+        postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
 
             if (!currentUser) {
                 throw new Error('only an authorized user can post a photo')
@@ -28,6 +28,8 @@ module.exports = {
             const { insertedId } = await photos.insertOne(newPhoto)
             newPhoto.id = insertedId.toString()
         
+            pubsub.publish('photo-added', { newPhoto })
+
             return newPhoto
     
         },

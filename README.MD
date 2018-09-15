@@ -5,57 +5,122 @@ PhotoShare is the main back-end exercise for [GraphQL Workshop](https://www.grap
 Changes
 ---------------
 
-### Import Object ID
+### Add Subscriptions to the Schema
 
-* [ ] Remove `const photos = require('../data/photos')`
-
-```javascript
-const { ObjectID } = require('mongodb')
-```
-
-### Modify postPhoto Mutation
-
-```javascript
-postPhoto: async (parent, { input }, { photos, currentUser }) => {
-
-    if (!currentUser) {
-        throw new Error('only an authorized user can post a photo')
-    }
-
-    const newPhoto = {
-        ...input,
-        userID: currentUser.githubLogin
-    }
-
-    const { insertedId } = await photos.insertOne(newPhoto)
-    newPhoto.id = insertedId.toString()
-
-    return newPhoto
-
+```graphql
+type Subscription {
+    newUser: User!
+    newPhoto: Photo!
 }
 ```
 
-### Modify Query Resolvers
+### Add Subscription support to the playground
 
+__index.js__
 ```javascript
-Query: {        
-    totalPhotos: (parent, args, { photos }) => photos.countDocuments(),
-    allPhotos: (parent, args, { photos }) => photos.find().toArray(),
-    Photo: (parent, { id }, { photos }) => photos.findOne({ _id: ObjectID(id) }),
+app.get('/playground', expressPlayground({ 
+    endpoint: '/graphql',
+    subscriptionEndpoint: '/graphql' 
+}))
+```
+
+### Create httpServer to support websocket
+
+__index.js__
+```javascript
+const { createServer } = require('http')
+```
+
+* [ ] remove `app.listen({ port }, () => { ... })`
+
+__index.js__
+```javascript
+const httpServer = createServer(app)
+server.installSubscriptionHandlers(httpServer)
+httpServer.listen({ port }, () => {
+    console.log(`photo-share api running on port ${port}`)
+})
+```
+
+### Add PubSub 
+
+__index.js__
+```javascript
+const { ApolloServer, PubSub } = require('apollo-server-express')
+```
+
+__index.js__
+```javascript
+const client = await MongoClient.connect(process.env.DB_HOST, { useNewUrlParser: true })
+const db = client.db()
+const pubsub = new PubSub()
+
+const context = async ({ req, connection }) => {
     ...
+    const githubToken = req ? req.headers.authorization : connection.context.Authorization
+    const currentUser = await users.findOne({ githubToken })
+    return { photos, users, currentUser, pubsub }
+}
+```
+
+### Add Subscription Resolvers
+
+__resolvers.js__
+```javascript
+Subscription: {
+    newPhoto: {
+        subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('photo-added')
+    },
+    newUser: {
+        subscribe: (root, data, { pubsub }) => pubsub.asyncIterator('user-added')
+    }
+}
+```
+
+### Publish Events
+
+__resolvers.js__
+```javascript
+ Mutation: {
+    postPhoto: async (parent, { input }, { photos, currentUser, pubsub }) => {
+
+        ...
+    
+        pubsub.publish('photo-added', { newPhoto })
+
+        return newPhoto
+
+    },
+    githubAuth: async (parent, { code }, { users, pubsub }) => {
+
+        ...
+
+        pubsub.publish('user-added', { newUser: user })
+
+        return { user, token: user.githubToken }
+        
+    }
 },
 ```
 
-### Modify Type Resolvers
+### Test
 
-```javascript
-Photo: {
-    ...
-    postedBy: (parent, args, { users }) => users.findOne({ githubLogin: parent.userID })
-},
+```graphql
+subscription {
+  newUser {
+    name
+  }
+}
+```
 
-User: {
-    postedPhotos: (parent, args, { photos}) => photos.find({ userID: parent.githubLogin }).toArray()
+```graphql
+mutation auth {
+  githubAuth(code: "TEST") {
+    token
+    user {
+      name
+    }
+  }
 }
 ```
 
@@ -96,7 +161,6 @@ Iterations
 
 ### e. Subscriptions and Files
 
-1. [ ] Adding Subscription Support 
-2. [ ] Publishing Events 
-3. [ ] Modifying the Schema to Support File Uploads 
-4. [ ] Uploading File with postPhoto 
+1. [x] Adding Subscription Support 
+2. [ ] Modifying the Schema to Support File Uploads 
+3. [ ] Uploading File with postPhoto 
