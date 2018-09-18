@@ -64,13 +64,15 @@ module.exports = {
                 githubToken: payload.access_token
             }
 
-            const { ops:[user] } = await users.replaceOne(
+            const { ops:[user], upsertedCount } = await users.replaceOne(
                 { githubLogin: payload.login }, 
                 githubUserInfo, 
                 { upsert: true }
             )
 
-            pubsub.publish('user-added', { newUser: user })
+            if (upsertedCount) {
+                pubsub.publish('user-added', { newUser: user })
+            }
 
             return { user, token: user.githubToken }
             
